@@ -4108,22 +4108,39 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
       return () => clearInterval(timer);
     }, [active, cur, period]);
     if (!active) return null;
+    const flipMark = 20000 / period; // position du retournement (20s/40s = 50%)
+    const pct = progress * 100;
+    const clr = progress < flipMark ? t.accent : t.green;
     return /*#__PURE__*/React.createElement("div", {
       style: {
         position: "absolute",
-        top: "2px",
-        left: 0,
-        right: 0,
-        height: "2px",
-        zIndex: 60
+        bottom: "36px",
+        left: "32px",
+        right: "32px",
+        height: "3px",
+        zIndex: 60,
+        borderRadius: "2px",
+        background: `${t.divider}60`
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        width: `${progress * 100}%`,
+        width: `${pct}%`,
         height: "100%",
+        background: clr,
+        borderRadius: "2px",
+        transition: "width 0.05s linear",
+        opacity: 0.7
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: "absolute",
+        top: "-3px",
+        left: `${flipMark * 100}%`,
+        width: "1px",
+        height: "9px",
         background: t.accent,
-        opacity: 0.4,
-        transition: "width 0.05s linear"
+        opacity: 0.5,
+        borderRadius: "1px"
       }
     }));
   }
@@ -9131,7 +9148,7 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
   const AUTO_PERIOD = 40000;
   function App() {
     const [cur, setCur] = useState(0);
-    const [auto, setAuto] = useState(false);
+    const [auto, setAuto] = useState(true);
     const [dk, setDk] = useState(true);
     const [dir, setDir] = useState(1);
     const th = dk ? dark : light;
