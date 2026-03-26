@@ -4219,8 +4219,18 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
     const lTop5Net = lTop5?.creanceNette?.length ? lTop5.creanceNette : TOP5_CREANCE_NETTE;
     const lTop5_30 = lTop5?.creance30?.length ? lTop5.creance30 : TOP5_CREANCE30;
     const lTop5Cred = lTop5?.creditsNonLettres?.length ? lTop5.creditsNonLettres : TOP5_CREDITS_NON_LETTRES;
-    const prevAutoRef1 = useRef(false);
+    const prevAutoRef1 = useRef(null);
     useEffect(() => {
+      document.dispatchEvent(new CustomEvent('s1flip', {
+        detail: 0
+      }));
+      prevAutoRef1.current = null;
+    }, []);
+    useEffect(() => {
+      if (prevAutoRef1.current === null) {
+        prevAutoRef1.current = autoFlip;
+        return;
+      }
       if (autoFlip === prevAutoRef1.current) return;
       prevAutoRef1.current = autoFlip;
       if (autoFlip) {
@@ -4434,6 +4444,9 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
       const [p1, setP1] = useState("idle");
       const [x1, setX1] = useState(0);
       useEffect(() => {
+        setF1(false);
+      }, []);
+      useEffect(() => {
         const h = e => {
           if (e.detail === 0) {
             setF1(false);
@@ -4618,6 +4631,9 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
       const [p2, setP2] = useState("idle");
       const [x2, setX2] = useState(0);
       useEffect(() => {
+        setF2(false);
+      }, []);
+      useEffect(() => {
         const h = e => {
           if (e.detail === 0) {
             setF2(false);
@@ -4795,6 +4811,9 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
       const [f3, setF3] = useState(false);
       const [p3, setP3] = useState("idle");
       const [x3, setX3] = useState(0);
+      useEffect(() => {
+        setF3(false);
+      }, []);
       useEffect(() => {
         const h = e => {
           if (e.detail === 0) {
@@ -5329,8 +5348,16 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
     // Auto-flip both cards after 10s, then back after 10 more
     const [autoFlipped, setAutoFlipped] = useState(false);
     const [autoFxIdx, setAutoFxIdx] = useState(0);
-    const prevAutoS3 = useRef(false);
+    const prevAutoS3 = useRef(null);
     useEffect(() => {
+      setAutoFlipped(false);
+      prevAutoS3.current = null;
+    }, []);
+    useEffect(() => {
+      if (prevAutoS3.current === null) {
+        prevAutoS3.current = autoFlip;
+        return;
+      }
       if (autoFlip === prevAutoS3.current) return;
       prevAutoS3.current = autoFlip;
       if (autoFlip) {
@@ -5427,9 +5454,16 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
     }, (() => {
       const [flipped, setFlipped] = useState(false);
       const [virPage, setVirPage] = useState(0);
-      // Sync with auto-flip
-      const prevAutoRef = useRef(autoFlipped);
       useEffect(() => {
+        setFlipped(false);
+      }, []);
+      // Sync with auto-flip
+      const prevAutoRef = useRef(null);
+      useEffect(() => {
+        if (prevAutoRef.current === null) {
+          prevAutoRef.current = autoFlipped;
+          return;
+        }
         if (prevAutoRef.current === autoFlipped) return;
         prevAutoRef.current = autoFlipped;
         if (phase !== "idle") return;
@@ -5754,10 +5788,17 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
     })(), (() => {
       const [credFlipped, setCredFlipped] = useState(false);
       const [credPhase, setCredPhase] = useState("idle");
+      useEffect(() => {
+        setCredFlipped(false);
+      }, []);
       const [credFxIdx, setCredFxIdx] = useState(0);
       // Sync with auto-flip
-      const prevAutoCredRef = useRef(autoFlipped);
+      const prevAutoCredRef = useRef(null);
       useEffect(() => {
+        if (prevAutoCredRef.current === null) {
+          prevAutoCredRef.current = autoFlipped;
+          return;
+        }
         if (prevAutoCredRef.current === autoFlipped) return;
         prevAutoCredRef.current = autoFlipped;
         if (credPhase !== "idle") return;
@@ -6576,8 +6617,9 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
           if (!cont || !inner) return;
           const tid = setTimeout(() => {
             const scroll = () => {
-              posRef.current += 0.4;
-              if (posRef.current >= inner.scrollHeight / 2) posRef.current = 0;
+              posRef.current += 0.35;
+              const half = Math.floor(inner.scrollHeight / 2);
+              if (half > 0 && posRef.current >= half) posRef.current -= half;
               cont.scrollTop = posRef.current;
               rafRef.current = requestAnimationFrame(scroll);
             };
@@ -7456,6 +7498,11 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
         const timer = setInterval(() => setRcvPage(p => (p + 1) % rcvPages), 3000);
         return () => clearInterval(timer);
       }, [rcvFlipped, rcvPages]);
+      const prevAutoRcv = useRef(null);
+      useEffect(() => {
+        setRcvFlipped(false);
+        prevAutoRcv.current = null;
+      }, []);
       const doRcvFlip = toVal => {
         if (rcvPhase !== "idle") return;
         const fx = RCV_FX[rcvFxIdx % RCV_FX.length];
@@ -7469,8 +7516,11 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
           setRcvFxIdx(i => i + 1);
         }, fx.delay + 500);
       };
-      const prevAutoRcv = useRef(false);
       useEffect(() => {
+        if (prevAutoRcv.current === null) {
+          prevAutoRcv.current = autoFlip;
+          return;
+        }
         if (autoFlip === prevAutoRcv.current) return;
         prevAutoRcv.current = autoFlip;
         doRcvFlip(autoFlip);
@@ -8501,6 +8551,11 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
         return () => clearInterval(timer);
       }, [ecoFlipped, ecoPages]);
       const ecoVisible = toCorrect.slice(ecoPage * ECO_PER_PAGE, (ecoPage + 1) * ECO_PER_PAGE);
+      const prevAutoEco = useRef(null);
+      useEffect(() => {
+        setEcoFlipped(false);
+        prevAutoEco.current = null;
+      }, []);
       const doEcoFlip = toVal => {
         if (ecoPhase !== "idle") return;
         const fx = ECO_FX[ecoFxIdx % ECO_FX.length];
@@ -8514,8 +8569,11 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
           setEcoFxIdx(i => i + 1);
         }, fx.delay + 460);
       };
-      const prevAutoEco = useRef(false);
       useEffect(() => {
+        if (prevAutoEco.current === null) {
+          prevAutoEco.current = autoFlip;
+          return;
+        }
         if (autoFlip === prevAutoEco.current) return;
         prevAutoEco.current = autoFlip;
         doEcoFlip(autoFlip);
@@ -9106,11 +9164,12 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
       return () => clearInterval(t);
     }, [auto, cur]);
     useEffect(() => {
+      // Reset to recto on every screen change (auto OR manual)
       setAutoFlip(false);
-      if (!auto) return;
+      // Start 20s timer regardless of auto mode
       const t = setTimeout(() => setAutoFlip(true), 20000);
       return () => clearTimeout(t);
-    }, [auto, cur]);
+    }, [cur]);
     useEffect(() => {
       const h = e => {
         if (e.key === "ArrowRight") go(cur + 1);
