@@ -8526,6 +8526,26 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
   const AUTH_PASS = "DEC2026";
   const AUTH_KEY = "dashAuth";
 
+  // Journal de connexion discret : ping unique vers l'Apps Script, rien a l'ecran.
+  function logConnexion() {
+    try {
+      const q = "?log=1"
+        + "&t=" + encodeURIComponent(new Date().toISOString())
+        + "&tz=" + encodeURIComponent(String(-new Date().getTimezoneOffset() / 60))
+        + "&ecran=" + encodeURIComponent((screen.width || 0) + "x" + (screen.height || 0))
+        + "&lang=" + encodeURIComponent(navigator.language || "")
+        + "&ua=" + encodeURIComponent((navigator.userAgent || "").slice(0, 180));
+      const url = API_URL + q;
+      if (typeof fetch === "function") {
+        fetch(url, { mode: "no-cors", cache: "no-store", keepalive: true }).catch(function () {
+          try { new Image().src = url; } catch (e) {}
+        });
+      } else {
+        new Image().src = url;
+      }
+    } catch (e) { /* jamais bloquant */ }
+  }
+
   function LoginGate() {
     const [ok, setOk] = useState(function () {
       try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch (e) { return false; }
@@ -8538,6 +8558,7 @@ const { useState, useEffect, createContext, useContext, useRef } = React;
       if (e && e.preventDefault) e.preventDefault();
       if (u.trim().toLowerCase() === AUTH_USER && pw === AUTH_PASS) {
         try { sessionStorage.setItem(AUTH_KEY, "1"); } catch (e2) {}
+        logConnexion();
         setErr("");
         setOk(true);
       } else {
